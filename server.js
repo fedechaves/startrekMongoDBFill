@@ -1,4 +1,5 @@
 //Require dependencies
+const { request, response } = require('express')
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
@@ -20,7 +21,7 @@ MongoClient.connect(dbConnectionStr, { useUnifiedTopology: true })
 
 //Set Middlewares
 app.set('view engine', 'ejs')
-app.use(express.static('public'))
+app.use(express.static(__dirname + '/public'))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
 
@@ -38,7 +39,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/api', (req, res) => {
-    console.log('port heard')
+    console.log('post heard')
     db.collection('star-trek-info').insertOne(
         req.body
     )
@@ -79,6 +80,15 @@ app.put('/updateEntry', (req, res) => {
 })
 
 app.delete('/deleteEntry', (req, res) =>{
+    db.collection('star-trek-info').deleteOne(
+        {name: request.body.name}
+    )
+    .then(result => {
+        console.log('entry deleted')
+        response.json('entry deleted')
+    })
+    .catch(err =>
+        console.error(err))
 
 })
 
